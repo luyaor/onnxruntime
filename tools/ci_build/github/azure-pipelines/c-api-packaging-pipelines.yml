@@ -1,5 +1,8 @@
 parameters:
-    RunOnnxRuntimeTests: true
+- name: RunOnnxRuntimeTests
+  displayName: Run Tests?
+  type: boolean
+  default: true
 
 jobs:
 - job: Linux_C_API_Packaging_CPU_x64
