@@ -2,7 +2,10 @@
 
 parameters:
   buildConfig: 'RelWithDebInfo'
-  artifactName: 'onnxruntime-win-x64'
+  #Like 'onnxruntime-win-x64-1.6.0'
+  artifactName: ''
+  #x86,x64,etc.
+  packageName: 'onnxruntime-win-x64'
   comitId: ''
 steps:
     - task: CmdLine@2
@@ -51,4 +54,4 @@ steps:
     - task: PublishPipelineArtifact@1
       inputs:
         targetPath: '$(Build.ArtifactStagingDirectory)\${{parameters.artifactName}}.zip' 
-        artifactName: ${{parameters.artifactName}} 
+        artifactName: 'onnxruntime-win-${{parameters.packageName}}

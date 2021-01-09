@@ -1,3 +1,6 @@
+parameters:
+    RunOnnxRuntimeTests: true
+
 jobs:
 - job: Linux_C_API_Packaging_CPU_x64
   workspace:
@@ -86,7 +89,7 @@ jobs:
         msbuildPlatform: Win32
         packageName: x86
         buildparameter: --x86
-        runTests: true
+        runTests: ${{ parameters.RunOnnxRuntimeTests }}
       x64:
         EnvSetupScript: setup_env.bat
         buildArch: x64
@@ -94,7 +97,7 @@ jobs:
         msbuildPlatform: x64
         packageName: x64
         buildparameter:
-        runTests: true
+        runTests: ${{ parameters.RunOnnxRuntimeTests }}
       arm:
         EnvSetupScript: setup_env.bat
         buildArch: x64
@@ -175,6 +178,7 @@ jobs:
       parameters:
         buildConfig: RelWithDebInfo
         artifactName: 'onnxruntime-win-$(packageName)-$(OnnxRuntimeVersion)'
+        packageName: $(packageName)
         commitId: $(OnnxRuntimeGitCommitHash)
 
     #Upload protoc.exe, which will be used in nuget build for generating C# files
