@@ -181,7 +181,7 @@ jobs:
     - task: PublishPipelineArtifact@1
       condition: and(succeeded(), eq(variables.packageName, 'x64'))
       inputs:
-        targetPath: '$(Build.BinariesDirectory)\${{parameters.buildConfig}}\external\protobuf\cmake\${{parameters.buildConfig}}\protoc.exe' 
+        targetPath: '$(Build.BinariesDirectory)\RelWithDebInfo\external\protobuf\cmake\RelWithDebInfo\protoc.exe' 
         artifactName: 'drop-extra' 
 
     - template: templates/component-governance-component-detection-steps.yml
