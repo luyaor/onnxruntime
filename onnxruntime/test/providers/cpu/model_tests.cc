@@ -447,8 +447,8 @@ TEST_P(ModelTest, Run) {
   if (provider_name == "cpu" && !is_single_node)
     execution_modes.push_back(ExecutionMode::ORT_PARALLEL);
 
-  std::vector<bool> use_single_thread{false};
 #ifndef _OPENMP
+  std::vector<bool> use_single_thread{false};
   // Test the model with intra op threadpool disabled
   if (provider_name == "cpu" && is_single_node)
     use_single_thread.push_back(true);
@@ -456,7 +456,9 @@ TEST_P(ModelTest, Run) {
 
   std::unique_ptr<ITestCase> l = CreateOnnxTestCase(ToMBString(test_case_name), std::move(model_info),
                                                     per_sample_tolerance, relative_per_sample_tolerance);
+#ifndef _OPENMP
   for (bool is_single_thread : use_single_thread) {
+#endif
     for (ExecutionMode execution_mode : execution_modes) {
       SessionOptions so;
 #ifndef _OPENMP
@@ -569,7 +571,9 @@ TEST_P(ModelTest, Run) {
         }
       }
     }
+#ifndef _OPENMP
   }
+#endif
 }
 
 // TODO: all providers
