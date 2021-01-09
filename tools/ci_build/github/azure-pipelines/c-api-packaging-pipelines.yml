@@ -237,8 +237,8 @@ jobs:
         createLogFile: true
 
   - task: DotNetCoreCLI@2
-      displayName: 'Test C#'
-      inputs:
+    displayName: 'Test C#'
+    inputs:
         command: test
         projects: '$(Build.SourcesDirectory)\csharp\test\Microsoft.ML.OnnxRuntime.Tests\Microsoft.ML.OnnxRuntime.Tests.csproj'
         configuration: '$(BuildConfig)'
