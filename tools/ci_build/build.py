@@ -315,12 +315,8 @@ def parse_arguments():
         "--use_vstest", action='store_true',
         help="Use use_vstest for running unitests.")
     parser.add_argument(
-        "--use_jemalloc", action='store_true', help="Use jemalloc.")
-    parser.add_argument(
         "--use_mimalloc", default=['none'],
         choices=['none', 'stl', 'arena', 'all'], help="Use mimalloc.")
-    parser.add_argument(
-        "--use_openblas", action='store_true', help="Build with OpenBLAS.")
     parser.add_argument(
         "--use_dnnl", action='store_true', help="Build with DNNL.")
     parser.add_argument(
@@ -567,7 +563,7 @@ def install_ubuntu_deps(args):
     Not required on docker. Provide help output if missing."""
 
     # check we need the packages first
-    if not (args.enable_pybind or args.use_openblas):
+    if not args.enable_pybind:
         return
 
     # not needed on docker as packages are pre-installed
@@ -575,9 +571,6 @@ def install_ubuntu_deps(args):
         try:
             if args.enable_pybind:
                 install_apt_package("python3")
-
-            if args.use_openblas:
-                install_apt_package("libopenblas-dev")
 
         except Exception as e:
             raise BuildError("Error setting up required APT packages. "
@@ -665,9 +658,6 @@ def generate_build_tree(cmake_path, source_dir, build_dir, cuda_home, cudnn_home
                         path_to_protoc_exe, configs, cmake_extra_defines, args, cmake_extra_args):
     log.info("Generating CMake build tree")
     cmake_dir = os.path.join(source_dir, "cmake")
-    # TODO: fix jemalloc build so it does not conflict with onnxruntime
-    # shared lib builds. (e.g. onnxuntime_pybind)
-    # for now, disable jemalloc if pybind is also enabled.
     cmake_args = [
         cmake_path, cmake_dir,
         "-Donnxruntime_RUN_ONNX_TESTS=" + (
@@ -682,7 +672,6 @@ def generate_build_tree(cmake_path, source_dir, build_dir, cuda_home, cudnn_home
         "-Donnxruntime_USE_FEATURIZERS=" + (
             "ON" if args.use_featurizers else "OFF"),
         "-Donnxruntime_CUDA_HOME=" + (cuda_home if args.use_cuda else ""),
-        "-Donnxruntime_USE_JEMALLOC=" + ("ON" if args.use_jemalloc else "OFF"),
         "-Donnxruntime_USE_MIMALLOC_STL_ALLOCATOR=" + (
             "ON" if args.use_mimalloc == "stl" or
             args.use_mimalloc == "all" else "OFF"),
@@ -696,9 +685,6 @@ def generate_build_tree(cmake_path, source_dir, build_dir, cuda_home, cudnn_home
         "-Donnxruntime_BUILD_NODEJS=" + ("ON" if args.build_nodejs else "OFF"),
         "-Donnxruntime_BUILD_SHARED_LIB=" + (
             "ON" if args.build_shared_lib else "OFF"),
-        "-Donnxruntime_USE_EIGEN_FOR_BLAS=" + (
-            "OFF" if args.use_openblas else "ON"),
-        "-Donnxruntime_USE_OPENBLAS=" + ("ON" if args.use_openblas else "OFF"),
         "-Donnxruntime_USE_DNNL=" + ("ON" if args.use_dnnl else "OFF"),
         "-Donnxruntime_DNNL_GPU_RUNTIME=" + (args.dnnl_gpu_runtime if args.use_dnnl else ""),
         "-Donnxruntime_DNNL_OPENCL_ROOT=" + (args.dnnl_opencl_root if args.use_dnnl else ""),
