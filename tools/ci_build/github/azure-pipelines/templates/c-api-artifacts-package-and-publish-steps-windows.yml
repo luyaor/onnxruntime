@@ -54,4 +54,4 @@ steps:
     - task: PublishPipelineArtifact@1
       inputs:
         targetPath: '$(Build.ArtifactStagingDirectory)\${{parameters.artifactName}}.zip' 
-        artifactName: 'onnxruntime-win-${{parameters.packageName}}
+        artifactName: 'onnxruntime-win-${{parameters.packageName}}'
