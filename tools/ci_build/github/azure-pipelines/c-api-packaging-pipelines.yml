@@ -207,8 +207,27 @@ jobs:
   - task: DownloadPipelineArtifact@0
     displayName: 'Download Pipeline Artifact - NuGet'
     inputs:
-      artifactName: 'drop-nuget'
+      artifactName: 'onnxruntime-win-x64'
       targetPath: '$(Build.BinariesDirectory)/nuget-artifact'
+
+  - task: DownloadPipelineArtifact@0
+    displayName: 'Download Pipeline Artifact - NuGet'
+    inputs:
+      artifactName: 'onnxruntime-win-x86'
+      targetPath: '$(Build.BinariesDirectory)/nuget-artifact'
+      
+  - task: DownloadPipelineArtifact@0
+    displayName: 'Download Pipeline Artifact - NuGet'
+    inputs:
+      artifactName: 'onnxruntime-win-arm64'
+      targetPath: '$(Build.BinariesDirectory)/nuget-artifact'
+
+  - task: DownloadPipelineArtifact@0
+    displayName: 'Download Pipeline Artifact - NuGet'
+    inputs:
+      artifactName: 'onnxruntime-win-arm'
+      targetPath: '$(Build.BinariesDirectory)/nuget-artifact'
+
 
   - task: DownloadPipelineArtifact@0
     displayName: 'Download Pipeline Artifact - NuGet'

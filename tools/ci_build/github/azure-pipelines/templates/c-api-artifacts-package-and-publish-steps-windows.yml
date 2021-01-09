@@ -51,4 +51,4 @@ steps:
     - task: PublishPipelineArtifact@1
       inputs:
         targetPath: '$(Build.ArtifactStagingDirectory)\${{parameters.artifactName}}.zip' 
-        artifactName: 'drop-nuget' 
+        artifactName: ${{parameters.artifactName}} 
