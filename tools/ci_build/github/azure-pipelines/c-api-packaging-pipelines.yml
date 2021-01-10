@@ -249,6 +249,11 @@ jobs:
       targetType: filePath
       filePath: $(Build.SourcesDirectory)\tools\ci_build\github\windows\extract_nuget_files.ps1
 
+  - task: NuGetToolInstaller@0
+    displayName: Use Nuget 5.7.0
+    inputs:
+      versionSpec: 5.7.0
+
   - task: VSBuild@1
     displayName: 'Build'
     inputs:
@@ -258,6 +263,7 @@ jobs:
         msbuildArchitecture: $(buildArch)
         maximumCpuCount: true
         logProjectEvents: true
+        restoreNugetPackages: true
         arguments: '-p:OnnxRuntimeBuildDirectory="$(Build.BinariesDirectory)" -p:OrtPackageId=$(OrtPackageId)'
         workingFolder: '$(Build.SourcesDirectory)\csharp'
         createLogFile: true
