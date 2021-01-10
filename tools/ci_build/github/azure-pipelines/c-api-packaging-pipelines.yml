@@ -10,12 +10,12 @@ parameters:
   default: true
 
 - name: DoEsrp
-  displayName: Run code sign tasks? Must be true if you are doing a release.
+  displayName: Run code sign tasks? Must be true if you are doing an Onnx Runtime release.
   type: boolean
-  default: true
+  default: false
 
 - name: IsReleaseBuild
-  displayName: Is Release Build? Set it to true when you are doing an Onnx Runtime release.
+  displayName: Is a release build? Set it to true if you are doing an Onnx Runtime release.
   type: boolean
   default: false
 
@@ -298,7 +298,7 @@ jobs:
 
   - task: DotNetCoreCLI@2
     displayName: 'Test C#'
-    condition: and(succeeded(), eq(parameters.RunOnnxRuntimeTests, true))
+    condition: and(succeeded(), eq('${{ parameters.RunOnnxRuntimeTests }}', true))
     inputs:
         command: test
         projects: '$(Build.SourcesDirectory)\csharp\test\Microsoft.ML.OnnxRuntime.Tests\Microsoft.ML.OnnxRuntime.Tests.csproj'
