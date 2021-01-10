@@ -698,6 +698,35 @@ include(eigen)
 # pthread is always at the last
 set(onnxruntime_EXTERNAL_LIBRARIES onnx onnx_proto ${PROTOBUF_LIB} re2::re2)
 
+
+set(onnxruntime_LINK_DIRS )
+if(onnxruntime_USE_CUDA)
+      if (WIN32)
+        list(APPEND onnxruntime_LINK_DIRS ${onnxruntime_CUDNN_HOME}/lib/x64)
+      else()
+        list(APPEND onnxruntime_LINK_DIRS ${onnxruntime_CUDNN_HOME}/lib64)
+      endif()
+endif()
+
+function(onnxruntime_add_shared_library target_name)
+  add_library(${target_name} SHARED ${ARGN})
+  target_link_directories(${target_name} PRIVATE ${onnxruntime_LINK_DIRS}) 
+  if (MSVC)
+    target_compile_options(${target_name} PRIVATE "$<$<COMPILE_LANGUAGE:CUDA>:SHELL:--compiler-options /utf-8>" "$<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:/utf-8>")
+    target_compile_options(${target_name} PRIVATE "$<$<COMPILE_LANGUAGE:CUDA>:SHELL:--compiler-options /sdl>" "$<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:/sdl>")
+    set_target_properties(${target_name} PROPERTIES VS_CA_EXCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
+  else()
+    target_compile_definitions(${target_name} PUBLIC -DNSYNC_ATOMIC_CPP11)
+    target_include_directories(${target_name} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/external/nsync/public")
+  endif()
+  target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${ONNXRUNTIME_ROOT})
+  if(onnxruntime_ENABLE_LTO)
+    set_target_properties(${target_name} PROPERTIES INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
+    set_target_properties(${target_name} PROPERTIES INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO TRUE)
+    set_target_properties(${target_name} PROPERTIES INTERPROCEDURAL_OPTIMIZATION_MINSIZEREL TRUE)
+  endif()
+endfunction()
+
 function(onnxruntime_add_include_to_target dst_target)
     foreach(src_target ${ARGN})
         target_include_directories(${dst_target} PRIVATE $<TARGET_PROPERTY:${src_target},INTERFACE_INCLUDE_DIRECTORIES>)
@@ -905,13 +934,11 @@ if (WIN32)
     string(APPEND CMAKE_CXX_FLAGS " /wd4251")
     # issued by thrust nonstandard extension used: nameless struct/union
     string(APPEND CMAKE_CXX_FLAGS " /wd4201")
-    if (onnxruntime_ENABLE_STATIC_ANALYSIS)
         string(APPEND CMAKE_CXX_FLAGS
             " /analyze:stacksize 131072"
             # disable warning because there are many occurrences from test macros
             " /wd6326 " # potential comparison of a constant with another constant
         )
-    endif()
 
     # Treat warning as error if onnxruntime_DEV_MODE is ON
     # For cross-compiled ARM64 binaries, there are too many warnings to fix, hence ignore warnings for now
@@ -1131,21 +1158,6 @@ if (onnxruntime_USE_CUDA)
     list(APPEND ONNXRUNTIME_CUDA_LIBRARIES cublas cudnn curand cufft)
   endif()
 
-  if (WIN32)
-    link_directories(${onnxruntime_CUDNN_HOME}/lib/x64)
-
-    # delayload causes crash on exit, so disable for now
-    # please update cudaDelayLoadedLibs in Microsoft.ML.OnnxRuntime/SessionOptions.cs if you change delayload
-    #file(GLOB cuda_dll_paths "${onnxruntime_CUDA_HOME}/bin/cublas64_*" "${onnxruntime_CUDA_HOME}/bin/cudart64_*" "${onnxruntime_CUDA_HOME}/bin/curand64_*" "${onnxruntime_CUDA_HOME}/bin/cufft64_*")
-    #set(onnxruntime_DELAYLOAD_FLAGS "${onnxruntime_DELAYLOAD_FLAGS} /DELAYLOAD:cudnn64_8.dll")
-    #foreach(cuda_dll_path ${cuda_dll_paths})
-    #    get_filename_component(cuda_dll_file_name ${cuda_dll_path} NAME)
-    #    set(onnxruntime_DELAYLOAD_FLAGS "${onnxruntime_DELAYLOAD_FLAGS} /DELAYLOAD:${cuda_dll_file_name}")
-    #endforeach(cuda_dll_path)
-
-  else()
-    link_directories(${onnxruntime_CUDNN_HOME}/lib64)
-  endif()
   list(APPEND onnxruntime_EXTERNAL_LIBRARIES ${ONNXRUNTIME_CUDA_LIBRARIES})
   if(NOT CMAKE_CUDA_ARCHITECTURES)
     if(CMAKE_LIBRARY_ARCHITECTURE STREQUAL "aarch64-linux-gnu")
@@ -1361,6 +1373,7 @@ foreach(target_name onnxruntime_common onnxruntime_graph onnxruntime_framework o
   if (MSVC)
     target_compile_options(${target_name} PRIVATE "$<$<COMPILE_LANGUAGE:CUDA>:SHELL:--compiler-options /utf-8>" "$<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:/utf-8>")
     target_compile_options(${target_name} PRIVATE "$<$<COMPILE_LANGUAGE:CUDA>:SHELL:--compiler-options /sdl>" "$<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:/sdl>")
+    set_target_properties(${target_name} PROPERTIES VS_CA_EXCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
   else()
     target_compile_definitions(${target_name} PUBLIC -DNSYNC_ATOMIC_CPP11)
     target_include_directories(${target_name} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/external/nsync/public")

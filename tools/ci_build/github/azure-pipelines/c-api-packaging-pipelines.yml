@@ -310,7 +310,7 @@ jobs:
         maximumCpuCount: true
         logProjectEvents: true
         restoreNugetPackages: true
-        arguments: '-p:OnnxRuntimeBuildDirectory="$(Build.BinariesDirectory)" -p:OrtPackageId=$(OrtPackageId)'
+        msbuildArgs: '-p:OnnxRuntimeBuildDirectory="$(Build.BinariesDirectory)" -p:OrtPackageId=$(OrtPackageId)'
         workingFolder: '$(Build.SourcesDirectory)\csharp'
         createLogFile: true
 
@@ -334,7 +334,7 @@ jobs:
         maximumCpuCount: true
         logProjectEvents: true
         restoreNugetPackages: true
-        arguments: '-p:OnnxRuntimeBuildDirectory="$(Build.BinariesDirectory)" -p:OrtPackageId=$(OrtPackageId)'
+        msbuildArgs: '-p:OnnxRuntimeBuildDirectory="$(Build.BinariesDirectory)" -p:OrtPackageId=$(OrtPackageId)'
         workingFolder: '$(Build.SourcesDirectory)\csharp'
         createLogFile: true
         msbuildArguments: '/t:CreatePackage'
