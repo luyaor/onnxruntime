@@ -49,7 +49,6 @@ jobs:
           artifactNameNoVersionString: 'onnxruntime-linux-x64'
           libraryName: 'libonnxruntime.so.$(OnnxRuntimeVersion)'
           commitId: $(OnnxRuntimeGitCommitHash)
-          DoEsrp: ${{ parameters.DoEsrp }}
 
     - template: templates/component-governance-component-detection-steps.yml
       parameters :
