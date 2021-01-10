@@ -40,6 +40,15 @@ steps:
     msBuildCommandline: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\amd64\msbuild.exe" "$(Build.BinariesDirectory)\RelWithDebInfo\onnxruntime.sln" /p:platform="${{parameters.msbuildPlatform}}" /p:configuration="RelWithDebInfo" /p:VisualStudioVersion="16.0" /m /p:PreferredToolArchitecture=x64'
   continueOnError: true
 
+- task: securedevelopmentteam.vss-secure-development-tools.build-task-semmle.Semmle@0
+  displayName: 'Run Semmle (cpp)'
+  inputs:
+    language: cpp
+    cleanupBuildCommands: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\amd64\msbuild.exe" "$(Build.BinariesDirectory)\RelWithDebInfo\onnxruntime.sln" /p:platform="${{parameters.msbuildPlatform}}" /p:configuration="RelWithDebInfo" /p:VisualStudioVersion="16.0" /m /p:PreferredToolArchitecture=x64'' /t:clean'
+    buildCommands: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\amd64\msbuild.exe" "$(Build.BinariesDirectory)\RelWithDebInfo\onnxruntime.sln" /p:platform="${{parameters.msbuildPlatform}}" /p:configuration="RelWithDebInfo" /p:VisualStudioVersion="16.0" /m /p:PreferredToolArchitecture=x64'' '
+    timeout: 7200
+
+
 - task: securedevelopmentteam.vss-secure-development-tools.build-task-report.SdtReport@1
   displayName: 'Create Security Analysis Report'
   inputs:
@@ -52,3 +61,15 @@ steps:
   displayName: 'Publish Security Analysis Logs'
   continueOnError: true
 
+- task: securedevelopmentteam.vss-secure-development-tools.build-task-uploadtotsa.TSAUpload@1
+  displayName: 'TSA Upload'
+  inputs:
+    tsaVersion: TsaV2
+    codebase: NewOrUpdate
+    serviceTreeID: '4119e2bc-94cb-4ba5-bcef-405e1b7e0a91'
+    codeBaseName: 'onnxruntime_master'
+    notificationAlias: 'chasun@microsoft.com'
+    codeBaseAdmins: 'FAREAST\chasun'
+    instanceUrlForTsaV2: MSDATA
+    projectNameMSDATA: Vienna
+    areaPath: 'Vienna\ONNX Runtime\Shared Core\Engineering Systems'
