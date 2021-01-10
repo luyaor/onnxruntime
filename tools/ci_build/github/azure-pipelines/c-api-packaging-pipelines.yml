@@ -270,12 +270,28 @@ jobs:
 
   - task: DotNetCoreCLI@2
     displayName: 'Test C#'
+    condition: and(succeeded(), eq(parameters.RunOnnxRuntimeTests, true))
     inputs:
         command: test
         projects: '$(Build.SourcesDirectory)\csharp\test\Microsoft.ML.OnnxRuntime.Tests\Microsoft.ML.OnnxRuntime.Tests.csproj'
         configuration: '$(BuildConfig)'
         arguments: '--configuration $(BuildConfig) -p:Platform="Any CPU" -p:OnnxRuntimeBuildDirectory="$(Build.BinariesDirectory)" -p:OrtPackageId=$(OrtPackageId)'
         workingDirectory: '$(Build.SourcesDirectory)\csharp'
+
+  - task: VSBuild@1
+    displayName: 'Build'
+    inputs:
+        solution: '$(Build.SourcesDirectory)\csharp\OnnxRuntime.CSharp.proj'
+        platform: 'Any CPU'
+        configuration: RelWithDebInfo
+        msbuildArchitecture: $(buildArch)
+        maximumCpuCount: true
+        logProjectEvents: true
+        restoreNugetPackages: true
+        arguments: '-p:OnnxRuntimeBuildDirectory="$(Build.BinariesDirectory)" -p:OrtPackageId=$(OrtPackageId)'
+        workingFolder: '$(Build.SourcesDirectory)\csharp'
+        createLogFile: true
+        msbuildArguments: '/t:CreatePackage'
 
   - template: nuget/templates/bundle_dlls.yml
 
