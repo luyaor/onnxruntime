@@ -6,7 +6,8 @@ parameters:
   artifactName: ''
   #x86,x64,etc.
   packageName: 'onnxruntime-win-x64'
-  comitId: ''
+  commitId: ''
+  DoEsrp: false
 steps:
     - task: CmdLine@2
       displayName: 'Copy build artifacts for zipping'
