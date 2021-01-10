@@ -1,13 +1,31 @@
 # sets up common build tools for the windows build machines before build
 
 parameters:
-  buildConfig: 'RelWithDebInfo'
-  #Like 'onnxruntime-win-x64-1.6.0'
-  artifactName: ''
-  #x86,x64,etc.
-  packageName: 'onnxruntime-win-x64'
-  commitId: ''
-  DoEsrp: false
+- name: DoEsrp
+  displayName: Run code sign tasks? Must be true if you are doing an Onnx Runtime release.
+  type: boolean
+  default: true
+
+- name: buildConfig
+  displayName: buildConfig
+  type: string
+  default: 'RelWithDebInfo'
+  
+- name: artifactName
+  displayName: artifactName，like 'onnxruntime-win-x64-1.6.0'
+  type: string
+  default: ''
+  
+- name: packageName
+  displayName: x86,x64,etc.
+  type: string
+  default: ''
+
+- name: commitId
+  displayName: commitId
+  type: string
+  default: ''
+
 steps:
     - task: CmdLine@2
       displayName: 'Copy build artifacts for zipping'
