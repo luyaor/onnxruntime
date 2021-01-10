@@ -59,7 +59,6 @@ option(onnxruntime_ENABLE_MEMLEAK_CHECKER "Experimental: Enable memory leak chec
 option(onnxruntime_USE_CUDA "Build with CUDA support" OFF)
 option(onnxruntime_ENABLE_CUDA_LINE_NUMBER_INFO "When building with CUDA support, generate device code line number information." OFF)
 option(onnxruntime_USE_OPENVINO "Build with OpenVINO support" OFF)
-option(onnxruntime_USE_EIGEN_FOR_BLAS "Use eign for blas" ON)
 option(onnxruntime_USE_NNAPI_BUILTIN "Build with builtin NNAPI lib for Android NNAPI support" OFF)
 option(onnxruntime_USE_RKNPU "Build with RKNPU support" OFF)
 option(onnxruntime_USE_DNNL "Build with DNNL support" OFF)
@@ -636,18 +635,6 @@ if (onnxruntime_USE_CUDA AND "${onnxruntime_CUDNN_HOME}" STREQUAL "")
   message(FATAL_ERROR "onnxruntime_CUDNN_HOME required for onnxruntime_USE_CUDA")
 endif()
 
-if (onnxruntime_USE_EIGEN_FOR_BLAS)
-  add_definitions(-DUSE_EIGEN_FOR_BLAS)
-endif()
-
-if (onnxruntime_USE_OPENBLAS AND "${onnxruntime_OPENBLAS_HOME}" STREQUAL "" AND WIN32)
-  # On linux we assume blas is installed via 'apt-get install libopenblas-dev'
-  message(FATAL_ERROR "onnxruntime_OPENBLAS_HOME required for onnxruntime_USE_OPENBLAS")
-endif()
-
-if (onnxruntime_USE_OPENBLAS AND onnxruntime_USE_EIGEN_FOR_BLAS)
-  message(FATAL_ERROR "use one of onnxruntime_USE_OPENBLAS, onnxruntime_USE_EIGEN_FOR_BLAS")
-endif()
 
 get_filename_component(ONNXRUNTIME_ROOT "${ONNXRUNTIME_ROOT}" ABSOLUTE)
 get_filename_component(ORTTRAINING_ROOT "${ORTTRAINING_ROOT}" ABSOLUTE)
@@ -693,8 +680,8 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -DGSL_UNENFORCED_O
 
 include(eigen)
 
-#onnxruntime_EXTERNAL_LIBRARIES could contain onnx, onnx_proto,libprotobuf, cuda/cudnn, jemalloc,
-# dnnl/mklml, openblas, onnxruntime_codegen_tvm, tvm, nnvm_compiler and pthread
+#onnxruntime_EXTERNAL_LIBRARIES could contain onnx, onnx_proto,libprotobuf, cuda/cudnn,
+# dnnl/mklml, onnxruntime_codegen_tvm, tvm, nnvm_compiler and pthread
 # pthread is always at the last
 set(onnxruntime_EXTERNAL_LIBRARIES onnx onnx_proto ${PROTOBUF_LIB} re2::re2)
 
@@ -934,12 +921,13 @@ if (WIN32)
     string(APPEND CMAKE_CXX_FLAGS " /wd4251")
     # issued by thrust nonstandard extension used: nameless struct/union
     string(APPEND CMAKE_CXX_FLAGS " /wd4201")
+    if (onnxruntime_ENABLE_STATIC_ANALYSIS)
         string(APPEND CMAKE_CXX_FLAGS
             " /analyze:stacksize 131072"
             # disable warning because there are many occurrences from test macros
             " /wd6326 " # potential comparison of a constant with another constant
         )
-
+    endif()
     # Treat warning as error if onnxruntime_DEV_MODE is ON
     # For cross-compiled ARM64 binaries, there are too many warnings to fix, hence ignore warnings for now
     if (onnxruntime_DEV_MODE AND NOT CMAKE_CROSSCOMPILING)
@@ -1017,19 +1005,6 @@ else()
   endif()
 endif()
 set(onnxruntime_DELAYLOAD_FLAGS "")
-if (onnxruntime_USE_JEMALLOC)
-  if (onnxruntime_USE_MIMALLOC_STL_ALLOCATOR OR onnxruntime_USE_MIMALLOC_ARENA_ALLOCATOR)
-    message( FATAL_ERROR "You cannot specify both jemalloc and mimalloc." )
-  endif()
-
-  if (Win32)
-    message( FATAL_ERROR "Jemalloc is not supported on Windows." )
-  endif()
-  include(jemalloc)
-  add_definitions(-DUSE_JEMALLOC=1)
-  list(APPEND onnxruntime_EXTERNAL_LIBRARIES ${JEMALLOC_STATIC_LIBRARIES})
-  list(APPEND onnxruntime_EXTERNAL_DEPENDENCIES jemalloc)
-endif()
 
 include_directories(
   ${ONNXRUNTIME_INCLUDE_DIR}
@@ -1113,17 +1088,6 @@ if (onnxruntime_USE_VITISAI)
     include(pyxir)
     list(APPEND onnxruntime_EXTERNAL_LIBRARIES pyxir)
     list(APPEND onnxruntime_EXTERNAL_DEPENDENCIES pyxir)
-  endif()
-endif()
-
-if (onnxruntime_USE_OPENBLAS)
-  add_definitions(-DUSE_OPENBLAS=1)
-  if (WIN32)
-    include_directories(${onnxruntime_OPENBLAS_HOME})
-    list(APPEND onnxruntime_EXTERNAL_LIBRARIES ${onnxruntime_OPENBLAS_HOME}/lib/libopenblas.lib)
-  else()
-    # on linux we assume blas is installed via 'apt-get install libopenblas-dev'
-    list(APPEND onnxruntime_EXTERNAL_LIBRARIES openblas)
   endif()
 endif()
 
