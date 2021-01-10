@@ -41,7 +41,7 @@ steps:
       parameters:
         FolderPath: '$(Build.BinariesDirectory)\${{parameters.artifactName}}'
         DisplayName: 'ESRP - Sign Native dlls'
-        DoEsrp: true
+        DoEsrp: ${{parameters.DoEsrp}}
         Pattern: '*.dll,*.exe'
 
     - task: ArchiveFiles@2

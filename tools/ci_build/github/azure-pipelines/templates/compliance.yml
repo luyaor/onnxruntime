@@ -1,3 +1,9 @@
+parameters:
+- name: msbuildPlatform
+  displayName: msbuildPlatform
+  type: string
+  default: x64
+  
 steps:
 - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
   displayName: 'Run CredScan'
@@ -31,7 +37,7 @@ steps:
     userProvideBuildInfo: msBuildInfo
     msBuildVersion: 16.0
     msBuildArchitecture: x64
-    msBuildCommandline: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\amd64\msbuild.exe" "$(Build.BinariesDirectory)\RelWithDebInfo\onnxruntime.sln" /p:platform="x64" /p:configuration="RelWithDebInfo" /p:VisualStudioVersion="16.0" /m /p:PreferredToolArchitecture=x64'
+    msBuildCommandline: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\amd64\msbuild.exe" "$(Build.BinariesDirectory)\RelWithDebInfo\onnxruntime.sln" /p:platform="${{parameters.msbuildPlatform}}" /p:configuration="RelWithDebInfo" /p:VisualStudioVersion="16.0" /m /p:PreferredToolArchitecture=x64'
   continueOnError: true
 
 - task: securedevelopmentteam.vss-secure-development-tools.build-task-report.SdtReport@1
