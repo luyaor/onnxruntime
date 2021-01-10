@@ -24,8 +24,7 @@ jobs:
   workspace:
     clean: all
   timeoutInMinutes:  60
-  pool:
-    vmImage: 'ubuntu-latest'
+  pool: 'Linux-CPU'
   steps:
     - template: templates/set-version-number-variables-step.yml
     - template: templates/get-docker-image-steps.yml
@@ -47,6 +46,7 @@ jobs:
       parameters:
           buildConfig: 'Release'
           artifactName: 'onnxruntime-linux-x64-$(OnnxRuntimeVersion)'
+          artifactNameNoVersionString: 'onnxruntime-linux-x64'
           libraryName: 'libonnxruntime.so.$(OnnxRuntimeVersion)'
           commitId: $(OnnxRuntimeGitCommitHash)
           DoEsrp: ${{ parameters.DoEsrp }}
@@ -55,7 +55,6 @@ jobs:
       parameters :
         condition : 'succeeded'
     - template: templates/clean-agent-build-directory-step.yml
- 
 
 - job: MacOS_C_API_Packaging_CPU_x64
   workspace:
@@ -86,6 +85,7 @@ jobs:
       parameters:
           buildConfig: 'Release'
           artifactName: 'onnxruntime-osx-x64-$(OnnxRuntimeVersion)'
+          artifactNameNoVersionString: 'onnxruntime-osx-x64'
           libraryName: 'libonnxruntime.$(OnnxRuntimeVersion).dylib'
           commitId: $(OnnxRuntimeGitCommitHash)
           
@@ -268,6 +268,17 @@ jobs:
       artifactName: 'onnxruntime-win-arm'
       targetPath: '$(Build.BinariesDirectory)/nuget-artifact'
 
+  - task: DownloadPipelineArtifact@0
+    displayName: 'Download Pipeline Artifact - NuGet'
+    inputs:
+      artifactName: 'onnxruntime-osx-x64'
+      targetPath: '$(Build.BinariesDirectory)/nuget-artifact'
+
+  - task: DownloadPipelineArtifact@0
+    displayName: 'Download Pipeline Artifact - NuGet'
+    inputs:
+      artifactName: 'onnxruntime-linux-x64'
+      targetPath: '$(Build.BinariesDirectory)/nuget-artifact'
 
   - task: DownloadPipelineArtifact@0
     displayName: 'Download Pipeline Artifact - NuGet'
@@ -275,17 +286,17 @@ jobs:
       artifactName: 'drop-extra'
       targetPath: '$(Build.BinariesDirectory)/extra-artifact'
 
-  - script: |
-     dir
-    workingDirectory: '$(Build.BinariesDirectory)/nuget-artifact'
-    displayName: 'List artifacts' 
-
   #Reconstruct the build dir
   - task: PowerShell@2
     displayName: 'PowerShell Script'
     inputs:
       targetType: filePath
       filePath: $(Build.SourcesDirectory)\tools\ci_build\github\windows\extract_nuget_files.ps1
+
+  - script: |
+     dir
+    workingDirectory: '$(Build.BinariesDirectory)/nuget-artifact'
+    displayName: 'List artifacts'
 
   - task: NuGetToolInstaller@0
     displayName: Use Nuget 5.7.0
@@ -328,8 +339,27 @@ jobs:
       configuration: RelWithDebInfo
       arguments: '--configuration RelWithDebInfo -t:CreatePackage -p:Platform="Any CPU" -p:OnnxRuntimeBuildDirectory="$(Build.BinariesDirectory)" -p:OrtPackageId=$(OrtPackageId)'
       workingDirectory: '$(Build.SourcesDirectory)\csharp'
-      
-  - template: nuget/templates/bundle_dlls.yml
+        
+
+  - task: BatchScript@1
+    displayName: 'Bundle Native NuGet and other binaries'
+    inputs:
+      filename: $(Build.SourcesDirectory)\tools\ci_build\github\windows\bundle_dlls.bat
+      workingFolder: $(Build.BinariesDirectory)\RelWithDebInfo\RelWithDebInfo\nuget-artifacts
+
+  - task: CopyFiles@2
+    displayName: 'Copy nuget packages to: $(Build.ArtifactStagingDirectory)'
+    inputs:
+      SourceFolder: '$(Build.BinariesDirectory)\RelWithDebInfo\RelWithDebInfo\nuget-artifacts'
+      Contents: '*.nupkg'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - task: CopyFiles@2
+    displayName: 'Copy nuget packages to: $(Build.ArtifactStagingDirectory)'
+    inputs:
+      SourceFolder: '$(Build.SourcesDirectory)\csharp\src\Microsoft.ML.OnnxRuntime\bin\RelWithDebInfo'
+      Contents: '*.nupkg'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
   - template: templates/esrp_nuget.yml
     parameters:
