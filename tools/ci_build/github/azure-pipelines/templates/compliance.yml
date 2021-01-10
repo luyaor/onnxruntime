@@ -1,11 +1,12 @@
 steps:
-- task: CredScan@2
+- task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
   displayName: 'Run CredScan'
   inputs:
+    toolMajorVersion: V2
     debugMode: false
   continueOnError: true
 
-- task: BinSkim@3
+- task: securedevelopmentteam.vss-secure-development-tools.build-task-binskim.BinSkim@3
   displayName: 'Run BinSkim'
   inputs:
     arguments: 'analyze $(Build.BinariesDirectory)\RelWithDebInfo\*.dll  --recurse --verbose'
