@@ -300,19 +300,14 @@ jobs:
       arguments: '--configuration RelWithDebInfo -p:Platform="Any CPU" -p:OrtPackageId=$(OrtPackageId)'
       workingDirectory: '$(Build.SourcesDirectory)\csharp'
 
-  - task: VSBuild@1
-    displayName: 'Build'
+  - task: DotNetCoreCLI@2
+    displayName: 'Build C#'
     inputs:
-        solution: '$(Build.SourcesDirectory)\csharp\OnnxRuntime.CSharp.sln'
-        platform: 'Any CPU'
-        configuration: RelWithDebInfo
-        msbuildArchitecture: $(buildArch)
-        maximumCpuCount: true
-        logProjectEvents: true
-        restoreNugetPackages: true
-        msbuildArgs: '-p:OnnxRuntimeBuildDirectory="$(Build.BinariesDirectory)" -p:OrtPackageId=$(OrtPackageId)'
-        workingFolder: '$(Build.SourcesDirectory)\csharp'
-        createLogFile: true
+      command: build
+      projects: '$(Build.SourcesDirectory)\csharp\OnnxRuntime.CSharp.sln'
+      configuration: RelWithDebInfo
+      arguments: '--configuration RelWithDebInfo -p:Platform="Any CPU" -p:OnnxRuntimeBuildDirectory="$(Build.BinariesDirectory)" -p:OrtPackageId=$(OrtPackageId)'
+      workingDirectory: '$(Build.SourcesDirectory)\csharp'
 
   - task: DotNetCoreCLI@2
     displayName: 'Test C#'
@@ -324,21 +319,15 @@ jobs:
         arguments: '--configuration $(BuildConfig) -p:Platform="Any CPU" -p:OnnxRuntimeBuildDirectory="$(Build.BinariesDirectory)" -p:OrtPackageId=$(OrtPackageId)'
         workingDirectory: '$(Build.SourcesDirectory)\csharp'
 
-  - task: VSBuild@1
-    displayName: 'Build'
+  - task: DotNetCoreCLI@2
+    displayName: 'Build C#'
     inputs:
-        solution: '$(Build.SourcesDirectory)\csharp\OnnxRuntime.CSharp.proj'
-        platform: 'Any CPU'
-        configuration: RelWithDebInfo
-        msbuildArchitecture: $(buildArch)
-        maximumCpuCount: true
-        logProjectEvents: true
-        restoreNugetPackages: true
-        msbuildArgs: '-p:OnnxRuntimeBuildDirectory="$(Build.BinariesDirectory)" -p:OrtPackageId=$(OrtPackageId)'
-        workingFolder: '$(Build.SourcesDirectory)\csharp'
-        createLogFile: true
-        msbuildArguments: '/t:CreatePackage'
-
+      command: build
+      projects: '$(Build.SourcesDirectory)\csharp\OnnxRuntime.CSharp.proj'
+      configuration: RelWithDebInfo
+      arguments: '--configuration RelWithDebInfo -t:CreatePackage -p:Platform="Any CPU" -p:OnnxRuntimeBuildDirectory="$(Build.BinariesDirectory)" -p:OrtPackageId=$(OrtPackageId)'
+      workingDirectory: '$(Build.SourcesDirectory)\csharp'
+      
   - template: nuget/templates/bundle_dlls.yml
 
   - template: templates/esrp_nuget.yml
