@@ -1,21 +1,17 @@
 parameters:
 - name: DoEsrp
-  displayName: Run code sign tasks? Must be true if you are doing an Onnx Runtime release.
   type: boolean
   default: true
 
 - name: FolderPath
-  displayName: FolderPath
   type: string
   default: ''
 
 - name: DisplayName
-  displayName: DisplayName
   type: string
   default: ''
 
 - name: Pattern
-  displayName: File Pattern
   type: string
   default: '*.dll'
 
