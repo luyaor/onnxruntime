@@ -27,10 +27,10 @@ New-Item -Path $Env:BUILD_BINARIESDIRECTORY\RelWithDebInfo\external\protobuf\cma
 Copy-Item -Path $Env:BUILD_BINARIESDIRECTORY\onnxruntime-win-x64-*\lib\* -Destination $Env:BUILD_BINARIESDIRECTORY\RelWithDebInfo\RelWithDebInfo
 Copy-Item -Path $Env:BUILD_BINARIESDIRECTORY\extra-artifact\protoc.exe $Env:BUILD_BINARIESDIRECTORY\RelWithDebInfo\external\protobuf\cmake\RelWithDebInfo
 
-Get-ChildItem C:\a\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-win-arm-* | Rename-Item -NewName C:\a\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-win-arm
-Get-ChildItem C:\a\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-win-arm64-* | Rename-Item -NewName C:\a\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-win-arm64
-Get-ChildItem C:\a\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-win-x86-* | Rename-Item -NewName C:\a\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-win-x86
+Get-ChildItem $Env:BUILD_BINARIESDIRECTORY\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-win-arm-* | Rename-Item -NewName $Env:BUILD_BINARIESDIRECTORY\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-win-arm
+Get-ChildItem $Env:BUILD_BINARIESDIRECTORY\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-win-arm64-* | Rename-Item -NewName $Env:BUILD_BINARIESDIRECTORY\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-win-arm64
+Get-ChildItem $Env:BUILD_BINARIESDIRECTORY\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-win-x86-* | Rename-Item -NewName $Env:BUILD_BINARIESDIRECTORY\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-win-x86
 
-Get-ChildItem C:\a\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-linux-x64-* | Rename-Item -NewName C:\a\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-linux-x64
+Get-ChildItem $Env:BUILD_BINARIESDIRECTORY\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-linux-x64-* | Rename-Item -NewName $Env:BUILD_BINARIESDIRECTORY\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-linux-x64
 
-Get-ChildItem C:\a\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-osx-x64-* | Rename-Item -NewName C:\a\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-osx-x64
+Get-ChildItem $Env:BUILD_BINARIESDIRECTORY\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-osx-x64-* | Rename-Item -NewName $Env:BUILD_BINARIESDIRECTORY\RelWithDebInfo\RelWithDebInfo\nuget-artifacts\onnxruntime-osx-x64

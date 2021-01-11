@@ -44,10 +44,9 @@ steps:
   displayName: 'Run Semmle (cpp)'
   inputs:
     language: cpp
-    cleanupBuildCommands: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\amd64\msbuild.exe" "$(Build.BinariesDirectory)\RelWithDebInfo\onnxruntime.sln" /p:platform="${{parameters.msbuildPlatform}}" /p:configuration="RelWithDebInfo" /p:VisualStudioVersion="16.0" /m /p:PreferredToolArchitecture=x64'' /t:clean'
-    buildCommands: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\amd64\msbuild.exe" "$(Build.BinariesDirectory)\RelWithDebInfo\onnxruntime.sln" /p:platform="${{parameters.msbuildPlatform}}" /p:configuration="RelWithDebInfo" /p:VisualStudioVersion="16.0" /m /p:PreferredToolArchitecture=x64'' '
+    cleanupBuildCommands: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\amd64\msbuild.exe" "$(Build.BinariesDirectory)\RelWithDebInfo\onnxruntime.sln" /p:platform=${{parameters.msbuildPlatform}} /p:configuration=RelWithDebInfo /p:VisualStudioVersion=16.0 /m /p:PreferredToolArchitecture=x64 /t:clean'
+    buildCommands: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\amd64\msbuild.exe" "$(Build.BinariesDirectory)\RelWithDebInfo\onnxruntime.sln" /p:platform=${{parameters.msbuildPlatform}} /p:configuration=RelWithDebInfo /p:VisualStudioVersion=16.0 /m /p:PreferredToolArchitecture=x64'
     timeout: 7200
-
 
 - task: securedevelopmentteam.vss-secure-development-tools.build-task-report.SdtReport@1
   displayName: 'Create Security Analysis Report'
