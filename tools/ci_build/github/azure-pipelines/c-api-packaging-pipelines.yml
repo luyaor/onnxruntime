@@ -43,6 +43,20 @@ jobs:
           /onnxruntime_src/tools/ci_build/build.py --build_dir /build --config Release \
           --skip_submodule_sync  --parallel --build_shared_lib --use_openmp
         workingDirectory: $(Build.SourcesDirectory)
+
+    - script: |
+       set -e -x       
+       mkdir $(Build.ArtifactStagingDirectory)/testdata
+       cp $(Build.BinariesDirectory)/Release/libcustom_op_library.so* $(Build.ArtifactStagingDirectory)/testdata 
+       ls -al $(Build.ArtifactStagingDirectory)
+      displayName: 'Create Artifacts'
+
+    - task: PublishPipelineArtifact@0
+      displayName: 'Publish Pipeline Artifact'
+      inputs:
+        artifactName: 'drop-linux'
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+
     - template: templates/c-api-artifacts-package-and-publish-steps-posix.yml
       parameters:
           buildConfig: 'Release'
@@ -88,6 +102,18 @@ jobs:
           artifactNameNoVersionString: 'onnxruntime-osx-x64'
           libraryName: 'libonnxruntime.$(OnnxRuntimeVersion).dylib'
           commitId: $(OnnxRuntimeGitCommitHash)
+
+    - script: |
+       set -e -x       
+       mkdir $(Build.ArtifactStagingDirectory)/testdata
+       cp $(Build.BinariesDirectory)/RelWithDebInfo/libcustom_op_library.dylib $(Build.ArtifactStagingDirectory)/testdata
+      displayName: 'Create Artifacts'
+
+    - task: PublishPipelineArtifact@0
+      displayName: 'Publish Pipeline Artifact'
+      inputs:
+        artifactName: 'drop-osx'
+        targetPath: '$(Build.ArtifactStagingDirectory)'
           
     - template: templates/component-governance-component-detection-steps.yml
       parameters :
@@ -194,6 +220,7 @@ jobs:
 
     - script: |
        dir *.dll
+       mkdir $(Build.ArtifactStagingDirectory)/testdata
       workingDirectory: '$(Build.BinariesDirectory)/RelWithDebInfo/RelWithDebInfo'
       displayName: 'List built DLLs' 
 
@@ -211,6 +238,22 @@ jobs:
       inputs:
         targetPath: '$(Build.BinariesDirectory)\RelWithDebInfo\external\protobuf\cmake\RelWithDebInfo\protoc.exe' 
         artifactName: 'drop-extra' 
+
+
+    - task: CopyFiles@2
+      displayName: 'Copy custom_op_library to: $(Build.ArtifactStagingDirectory)'
+      condition: and(succeeded(), eq(variables.packageName, 'x64'))
+      inputs:
+        SourceFolder: '$(Build.BinariesDirectory)\RelWithDebInfo\RelWithDebInfo'
+        Contents: 'custom_op_library.dll'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/testdata'
+
+    #To be used in test_win.yml
+    - task: PublishPipelineArtifact@1
+      condition: and(succeeded(), eq(variables.packageName, 'x64'))
+      inputs:
+        targetPath: '$(Build.BinariesDirectory)\RelWithDebInfo\external\protobuf\cmake\RelWithDebInfo\protoc.exe' 
+        artifactName: 'drop-nuget'
 
     - ${{ if eq(parameters['DoCompliance'], 'true') }}:
       - task: PythonScript@0
