@@ -106,7 +106,7 @@ jobs:
     - script: |
        set -e -x       
        mkdir $(Build.ArtifactStagingDirectory)/testdata
-       cp $(Build.BinariesDirectory)/RelWithDebInfo/libcustom_op_library.dylib $(Build.ArtifactStagingDirectory)/testdata
+       cp $(Build.BinariesDirectory)/Release/libcustom_op_library.dylib $(Build.ArtifactStagingDirectory)/testdata
       displayName: 'Create Artifacts'
 
     - task: PublishPipelineArtifact@0
@@ -220,7 +220,7 @@ jobs:
 
     - script: |
        dir *.dll
-       mkdir $(Build.ArtifactStagingDirectory)/testdata
+       mkdir $(Build.ArtifactStagingDirectory)\testdata
       workingDirectory: '$(Build.BinariesDirectory)/RelWithDebInfo/RelWithDebInfo'
       displayName: 'List built DLLs' 
 
