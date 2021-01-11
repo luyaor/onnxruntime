@@ -398,14 +398,14 @@ jobs:
   - NuGet_Test_MacOS
   steps:
 
-  - template: ../../templates/set-version-number-variables-step.yml
+  - template: templates/set-version-number-variables-step.yml
 
-  - template: upload-binary-sizes-from-nuget-package.yml
+  - template: nuget/templates/upload-binary-sizes-from-nuget-package.yml
     parameters:
       downloadPath: $(Build.BinariesDirectory)/nuget-artifact/final-package
       gitCommitHash: $(OnnxRuntimeGitCommitHashShort)  
 
-  - template: get-nuget-package-version-as-variable.yml
+  - template: nuget/templates/get-nuget-package-version-as-variable.yml
     parameters:
       packageFolder: '$(Build.BinariesDirectory)/nuget-artifact/final-package'
 
